@@ -21,10 +21,25 @@ func getTasks(c *gin.Context) {
 	c.JSON(http.StatusOK, Tasks)
 }
 
+func createTask(c *gin.Context) {
+	var new Task
+
+	if err := c.ShouldBindJSON(&new); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON"})
+		return
+	}
+
+	new.ID = len(Tasks) + 1
+	Tasks = append(Tasks, new)
+
+	c.JSON(http.StatusCreated, new)
+}
+
 func main() {
 	r := gin.Default()
 
 	r.GET("/tasks", getTasks)
+	r.POST("/tasks", createTask)
 
 	r.Run()
 }
